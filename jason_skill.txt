@@ -28,11 +28,37 @@
                         }
                     ],
                     "samples": [
-                        "Pay {cash} in a couple of minutes",
                         "Pay {cash} pounds now to {person}",
                         "Pay {cash} bucks now to {person}",
                         "Pay {cash} dollars to {person}",
-                        "Make a payment of {cash} pounds to {person}"
+                        "Make a payment of {cash} pounds to {person}",
+                        "Pay {person} {cash} pounds",
+                        "Pay {person} {cash} bucks",
+                        "Transfer {cash} pounds to {person}"
+                    ]
+                },
+                {
+                    "name": "CreditScoreIntent",
+                    "slots": [],
+                    "samples": [
+                        "What is my credit score",
+                        "Tell me my credit score"
+                    ]
+                },
+                {
+                    "name": "BalanceIntent",
+                    "slots": [],
+                    "samples": [
+                        "What is my balance",
+                        "Tell me my balance"
+                    ]
+                },
+                {
+                    "name": "RewardPointsIntent",
+                    "slots": [],
+                    "samples": [
+                        "How many reward points I have",
+                        "Tell me the amount of reward points I have"
                     ]
                 }
             ],
