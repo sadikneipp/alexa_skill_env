@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "happiness",
+            "invocationName": "capital one payment",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -29,7 +29,10 @@
                     ],
                     "samples": [
                         "Pay {cash} in a couple of minutes",
-                        "Pay {cash} pounds now to {person}"
+                        "Pay {cash} pounds now to {person}",
+                        "Pay {cash} bucks now to {person}",
+                        "Pay {cash} dollars to {person}",
+                        "Make a payment of {cash} pounds to {person}",
                     ]
                 }
             ],
