@@ -32,7 +32,7 @@
                         "Pay {cash} pounds now to {person}",
                         "Pay {cash} bucks now to {person}",
                         "Pay {cash} dollars to {person}",
-                        "Make a payment of {cash} pounds to {person}",
+                        "Make a payment of {cash} pounds to {person}"
                     ]
                 }
             ],
