@@ -43,7 +43,18 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speech_text = "Hello Python World from Classes!"
+        #cash = handler_input["slots"]
+        slots = handler_input.request_envelope.request.intent.slots
+        #request_envelope.request.intent.slots
+        fact_number = int(slots["cash"].value)
+        fact_name = str(slots["person"].value)
+        
+    
+        if fact_number <= 10:
+            speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
+        else:
+            speech_text = "Uh thats too much! " + str(fact_number)
+
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
@@ -141,3 +152,4 @@ sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_exception_handler(CatchAllExceptionHandler())
 
 handler = sb.lambda_handler()
+
