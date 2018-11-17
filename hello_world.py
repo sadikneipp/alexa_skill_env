@@ -59,7 +59,7 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         slots = handler_input.request_envelope.request.intent.slots
         fact_number = int(slots["cash"].value)
-        fact_name = str(slots["person"].value)
+        fact_name = str(slots["person"].value).lower()
         
         auth = check_auth({"source": "mary",
                     "target": fact_name,
