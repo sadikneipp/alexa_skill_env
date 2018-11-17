@@ -1,0 +1,39 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "happiness",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "HelloWorldIntent",
+                    "slots": [
+                        {
+                            "name": "cash",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "person",
+                            "type": "AMAZON.US_FIRST_NAME"
+                        }
+                    ],
+                    "samples": [
+                        "Pay {cash} in a couple of minutes",
+                        "Pay {cash} pounds now to {person}"
+                    ]
+                }
+            ],
+            "types": []
+        }
+    }
+}
