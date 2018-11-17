@@ -13,11 +13,25 @@ from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model.ui import SimpleCard
 from ask_sdk_model import Response
 
+import requests
+
 sb = SkillBuilder()
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+URL = 'http://35.197.194.231:5000/authenticate/'
+headers = "Content-Type: application/json"
+
+def check_auth(json):
+    r = requests.post(URL,
+                  json = json, #{"source":"mary","target":"john", "value": 100},
+                  headers = {"Content-Type": "application/json"})
+    ans = r.json()
+    if ans['auth'] == 1:
+        return True
+    
+    return False
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -49,11 +63,17 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         fact_number = int(slots["cash"].value)
         fact_name = str(slots["person"].value)
         
+        auth = check_auth({"source": "mary",
+                    "target": fact_name,
+                    "value":fact_number})
+        
     
-        if fact_number <= 10:
+        if fact_number <= 10 and auth:
             speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
-        else:
+        elif fact_number > 10:
             speech_text = "Uh thats too much! " + str(fact_number)
+        elif not auth:
+            speech_text = "Payment unauthorized!" + str(fact_number)
 
 
         handler_input.response_builder.speak(speech_text).set_card(
@@ -152,4 +172,3 @@ sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_exception_handler(CatchAllExceptionHandler())
 
 handler = sb.lambda_handler()
-
