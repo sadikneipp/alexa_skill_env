@@ -41,7 +41,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speech_text = "Welcome to the Alexa Skills Kit, you can say hello!"
+        speech_text = "Welcome to the Capital One online payment! What can I help you today?"
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
@@ -57,9 +57,7 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        #cash = handler_input["slots"]
         slots = handler_input.request_envelope.request.intent.slots
-        #request_envelope.request.intent.slots
         fact_number = int(slots["cash"].value)
         fact_name = str(slots["person"].value)
         
