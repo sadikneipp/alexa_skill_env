@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "happiness",
+            "invocationName": "capital one payment",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
