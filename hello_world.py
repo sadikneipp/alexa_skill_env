@@ -50,9 +50,13 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         #request_envelope.request.intent.slots
         fact_number = int(slots["cash"].value)
         fact_name = str(slots["person"].value)
-
-
-        if fact_number <= 10:
+        
+        auth = check_auth({"source": "mary",
+                    "target": fact_name,
+                    "value":fact_number})
+        
+    
+        if fact_number <= 10 and auth:
             speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
         else:
             speech_text = "Please authorize with the!"
