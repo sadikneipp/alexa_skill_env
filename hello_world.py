@@ -32,6 +32,9 @@ logger.setLevel(logging.INFO)
 URL = 'http://35.197.194.231:5000/authenticate/'
 headers = "Content-Type: application/json"
 
+fact_number = None
+fact_name = None
+
 def check_auth(json):
     r = requests.post(URL,
                   json = json, #{"source":"mary","target":"john", "value": 100},
@@ -92,9 +95,28 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         #cash = handler_input["slots"]
         slots = handler_input.request_envelope.request.intent.slots
-        #request_envelope.request.intent.slots
+        global fact_number
+        global fact_name
         fact_number = int(slots["cash"].value)
         fact_name = str(slots["person"].value).lower()
+        
+        speech_text = "Do you want to transfer " + str(fact_number) + " pounds to " + str(fact_name) + '?'
+        
+        handler_input.response_builder.speak(speech_text).set_card(
+            SimpleCard("Hello World", speech_text)).set_should_end_session(
+            False)
+        return handler_input.response_builder.response
+        
+class YesTransactionIntentHandler(AbstractRequestHandler):
+    """Handler for YesTransaction Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return is_intent_name("AMAZON.YesIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        slots = handler_input.request_envelope.request.intent.slots
+        #request_envelope.request.intent.slots
         fact_operation = "transfer"
 
         payload = {"source": "mary",
@@ -103,10 +125,6 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
                     "operation": fact_operation
         }
 
-        speech_text = "Please authorize the fact_operation on your phone."
-        
-        # _progressive_response_(handler_input, speech_text)
-        
         start = time.time()
         now = time.time()
         auth = False
@@ -120,6 +138,22 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
             speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
         else:
             speech_text = "Transaction not authorized."
+
+        handler_input.response_builder.speak(speech_text).set_card(
+            SimpleCard("Hello World", speech_text)).set_should_end_session(
+            False)
+        return handler_input.response_builder.response
+        
+
+class NoTransactionIntentHandler(AbstractRequestHandler):
+    """Handler for NoTransaction Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return is_intent_name("AMAZON.NoIntent")(handler_input)
+
+    def handle(self, handler_input):
+
+        speech_text = "Operation canceled"
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
@@ -169,7 +203,7 @@ class BalanceIntentHandler(AbstractRequestHandler):
         }
         
         balance_value = int(check_values(payload))
-        speech_text = "Your balance is " + str(balance_value) " pounds."
+        speech_text = "Your balance is " + str(balance_value) + " pounds."
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
@@ -268,6 +302,8 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelloWorldIntentHandler())
+sb.add_request_handler(NoTransactionIntentHandler())
+sb.add_request_handler(YesTransactionIntentHandler())
 sb.add_request_handler(CreditScoreIntentHandler())
 sb.add_request_handler(BalanceIntentHandler())
 sb.add_request_handler(RewardPointsIntentHandler())
