@@ -32,8 +32,11 @@ logger.setLevel(logging.INFO)
 URL = 'http://35.197.194.231:5000/authenticate/'
 headers = "Content-Type: application/json"
 
+
+#globals for flow control
 fact_number = None
 fact_name = None
+transaction_completed = False
 
 def check_auth(json):
     r = requests.post(URL,
@@ -111,7 +114,7 @@ class YesTransactionIntentHandler(AbstractRequestHandler):
     """Handler for YesTransaction Intent."""
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        return is_intent_name("AMAZON.YesIntent")(handler_input)
+        return is_intent_name("AMAZON.YesIntent")(handler_input) and not transaction_completed
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
@@ -135,7 +138,10 @@ class YesTransactionIntentHandler(AbstractRequestHandler):
             time.sleep(1)
         
         if auth:
-            speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
+            global transaction_completed
+            transaction_completed = True
+            speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully! " + \
+            "Would you like to add the transaction to Splitwise?"
         else:
             speech_text = "Transaction not authorized."
 
@@ -152,15 +158,39 @@ class NoTransactionIntentHandler(AbstractRequestHandler):
         return is_intent_name("AMAZON.NoIntent")(handler_input)
 
     def handle(self, handler_input):
-
-        speech_text = "Operation canceled"
+        
+        if transaction_completed:
+            speech_text = "Okay! I wont add the transaction to Splitwise"
+            global transaction_completed
+            transaction_completed = False
+            
+        else:
+            speech_text = "Operation canceled"
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
             False)
         return handler_input.response_builder.response
 
+class SplitwiseIntentHandler(AbstractRequestHandler):
+    """Handler for Splitwise Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return is_intent_name("AMAZON.YesIntent")(handler_input) and transaction_completed
 
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        
+        speech_text = "Transaction added to your splitwise account!"
+        
+        global transaction_completed
+        transaction_completed = False
+        handler_input.response_builder.speak(speech_text).set_card(
+            SimpleCard("Hello World", speech_text)).set_should_end_session(
+            False)
+        return handler_input.response_builder.response
+        
+        
 class CreditScoreIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
     def can_handle(self, handler_input):
@@ -304,6 +334,7 @@ sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelloWorldIntentHandler())
 sb.add_request_handler(NoTransactionIntentHandler())
 sb.add_request_handler(YesTransactionIntentHandler())
+sb.add_request_handler(SplitwiseIntentHandler())
 sb.add_request_handler(CreditScoreIntentHandler())
 sb.add_request_handler(BalanceIntentHandler())
 sb.add_request_handler(RewardPointsIntentHandler())
