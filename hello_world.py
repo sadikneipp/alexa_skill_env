@@ -42,6 +42,13 @@ def check_auth(json):
     
     return False
     
+def check_values(json):
+    r = requests.post(URL,
+                  json = json, #{"source":"mary","target":"john", "value": 100},
+                  headers = {"Content-Type": "application/json"})
+    ans = r.json()
+    return ans['value']
+    
 def _progressive_response_(handler_input, speech): 
     #Call Alexa Directive Service.
     requestEnvelope = handler_input.request_envelope
@@ -136,7 +143,9 @@ class CreditScoreIntentHandler(AbstractRequestHandler):
                     "operation": fact_operation
         }
 
-        speech_text = "Your credit score is " + str(randint(0, 100)) + "."
+        creditscore_value = int(check_values(payload))
+
+        speech_text = "Your credit score is " + str(creditscore_value) + "."
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
@@ -158,7 +167,9 @@ class BalanceIntentHandler(AbstractRequestHandler):
                     "value": 0,
                     "operation": fact_operation
         }
-        speech_text = "Your balance is £" + str(randint(1200, 3000)) +",00."
+        
+        balance_value = int(check_values(payload))
+        speech_text = "Your balance is " + str(balance_value) " pounds."
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
@@ -180,7 +191,10 @@ class RewardPointsIntentHandler(AbstractRequestHandler):
                     "value": 0,
                     "operation": fact_operation
         }
-        speech_text = "You have "+ str(randint(10000, 60000)) + " reward points!"
+        
+        rewardpoints_value = int(check_values(payload))
+
+        speech_text = "You have "+ str(rewardpoints_value) + " reward points!"
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
