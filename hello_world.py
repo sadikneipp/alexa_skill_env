@@ -3,7 +3,7 @@
 # This is a simple Hello World Alexa Skill, built using
 # the implementation of handler classes approach in skill builder.
 import logging
-
+import requests
 from random import randint
 
 from ask_sdk_core.skill_builder import SkillBuilder
@@ -21,6 +21,19 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+URL = 'http://35.197.194.231:5000/authenticate/'
+headers = "Content-Type: application/json"
+
+def check_auth(json):
+    r = requests.post(URL,
+                  json = json, #{"source":"mary","target":"john", "value": 100},
+                  headers = {"Content-Type": "application/json"})
+    ans = r.json()
+    if ans['auth'] == 1:
+        return True
+    
+    return False
+
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
     def can_handle(self, handler_input):
@@ -37,6 +50,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         return handler_input.response_builder.response
 
 
+
 class HelloWorldIntentHandler(AbstractRequestHandler):
     """Handler for Hello World Intent."""
     def can_handle(self, handler_input):
@@ -49,14 +63,16 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         slots = handler_input.request_envelope.request.intent.slots
         #request_envelope.request.intent.slots
         fact_number = int(slots["cash"].value)
-        fact_name = str(slots["person"].value)
+        fact_name = str(slots["person"].value).lower()
 
-
-        if fact_number <= 10:
+        auth = check_auth({"source": "mary",
+                    "target": fact_name,
+                    "value":fact_number})
+        
+        if fact_number <= 10 and auth:
             speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
         else:
             speech_text = "Please authorize with the!"
-
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
