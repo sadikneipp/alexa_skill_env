@@ -69,6 +69,7 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
                     "target": fact_name,
                     "value":fact_number})
         
+    
         if fact_number <= 10 and auth:
             speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
         else:
