@@ -4,6 +4,7 @@
 # the implementation of handler classes approach in skill builder.
 import logging
 import requests
+import time
 from random import randint
 
 from ask_sdk_core.skill_builder import SkillBuilder
@@ -11,11 +12,18 @@ from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.utils import is_request_type, is_intent_name
 from ask_sdk_core.handler_input import HandlerInput
+from ask_sdk_model.services.directive import (
+    SendDirectiveRequest, Header, SpeakDirective)
 
 from ask_sdk_model.ui import SimpleCard
 from ask_sdk_model import Response
 
-sb = SkillBuilder()
+
+from ask_sdk_core.api_client import DefaultApiClient
+from ask_sdk_core.skill_builder import CustomSkillBuilder
+
+
+sb = CustomSkillBuilder(api_client=DefaultApiClient())
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -33,6 +41,22 @@ def check_auth(json):
         return True
     
     return False
+    
+def _progressive_response_(handler_input, speech): 
+    #Call Alexa Directive Service.
+    requestEnvelope = handler_input.request_envelope
+    directiveServiceClient = handler_input.service_client_factory.get_directive_service();
+    requestId = requestEnvelope.request.request_id;
+    endpoint = handler_input.request_envelope.context.system.api_endpoint
+    accessToken = handler_input.request_envelope.context.system.api_access_token 
+    directive = SendDirectiveRequest(
+                header    = Header(requestId),
+                directive = SpeakDirective(
+                            speech = speech
+              )
+    )    
+    #send directive
+    return directiveServiceClient.enqueue(directive)
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -65,15 +89,27 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         fact_number = int(slots["cash"].value)
         fact_name = str(slots["person"].value).lower()
 
-        auth = check_auth({"source": "mary",
+        payload = {"source": "mary",
                     "target": fact_name,
-                    "value":fact_number})
+                    "value":fact_number}
+
+        speech_text = "Please authorize the operation on your phone."
         
-    
-        if fact_number <= 10 and auth:
+        # _progressive_response_(handler_input, speech_text)
+        
+        start = time.time()
+        now = time.time()
+        auth = False
+        
+        while not auth and now-start < 60:
+            auth = check_auth(payload)
+            now = time.time()
+            time.sleep(1)
+        
+        if auth:
             speech_text = "The payment of "  + str(fact_number) + " pounds to " + fact_name + " was done succesfully!"
         else:
-            speech_text = "Please authorize with the!"
+            speech_text = "Transaction not authorized."
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(
