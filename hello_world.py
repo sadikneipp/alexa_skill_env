@@ -88,12 +88,15 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         #request_envelope.request.intent.slots
         fact_number = int(slots["cash"].value)
         fact_name = str(slots["person"].value).lower()
+        fact_operation = "transfer"
 
         payload = {"source": "mary",
                     "target": fact_name,
-                    "value":fact_number}
+                    "value":fact_number,
+                    "operation": fact_operation
+        }
 
-        speech_text = "Please authorize the operation on your phone."
+        speech_text = "Please authorize the fact_operation on your phone."
         
         # _progressive_response_(handler_input, speech_text)
         
@@ -125,6 +128,14 @@ class CreditScoreIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        fact_operation = "credit_score"
+
+        payload = {"source": "mary",
+                    "target": "",
+                    "value": 0,
+                    "operation": fact_operation
+        }
+
         speech_text = "Your credit score is " + str(randint(0, 100)) + "."
 
         handler_input.response_builder.speak(speech_text).set_card(
@@ -140,6 +151,13 @@ class BalanceIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        fact_operation = "balance"
+
+        payload = {"source": "mary",
+                    "target": "",
+                    "value": 0,
+                    "operation": fact_operation
+        }
         speech_text = "Your balance is £" + str(randint(1200, 3000)) +",00."
 
         handler_input.response_builder.speak(speech_text).set_card(
@@ -155,6 +173,13 @@ class RewardPointsIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        fact_operation = "reward_points"
+
+        payload = {"source": "mary",
+                    "target": "",
+                    "value": 0,
+                    "operation": fact_operation
+        }
         speech_text = "You have "+ str(randint(10000, 60000)) + " reward points!"
 
         handler_input.response_builder.speak(speech_text).set_card(
