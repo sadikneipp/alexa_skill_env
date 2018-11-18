@@ -18,10 +18,8 @@ from ask_sdk_model.services.directive import (
 from ask_sdk_model.ui import SimpleCard
 from ask_sdk_model import Response
 
-
 from ask_sdk_core.api_client import DefaultApiClient
 from ask_sdk_core.skill_builder import CustomSkillBuilder
-
 
 sb = CustomSkillBuilder(api_client=DefaultApiClient())
 
@@ -158,10 +156,10 @@ class NoTransactionIntentHandler(AbstractRequestHandler):
         return is_intent_name("AMAZON.NoIntent")(handler_input)
 
     def handle(self, handler_input):
-        
+        global transaction_completed
         if transaction_completed:
             speech_text = "Okay! I wont add the transaction to Splitwise"
-            global transaction_completed
+            
             transaction_completed = False
             
         else:
